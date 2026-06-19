@@ -53,7 +53,7 @@ public class PayloadController {
     @PostMapping("/fuzz/{id}")
     public String fuzz(@PathVariable Long id, @RequestParam String targetUrl) {
         AttackPayload payload = payloadService.getPayloadById(id);
-        fuzzer.fuzz(targetUrl, payload.getContent());
+        fuzzer.fuzz(targetUrl, payload);
         return "Fuzzing attack initiated for payload ID: " + id + " against " + targetUrl;
     }
 

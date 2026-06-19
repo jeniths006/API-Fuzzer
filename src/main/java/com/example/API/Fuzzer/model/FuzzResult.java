@@ -15,4 +15,8 @@ public class FuzzResult {
     private int statusCode;
     @Column(columnDefinition = "TEXT")
     private String responseBody;
+
+    private long responseTime;
+    private long responseSize;
+    private String payloadCategory;
 }
