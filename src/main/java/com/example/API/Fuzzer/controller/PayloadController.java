@@ -62,4 +62,9 @@ public class PayloadController {
         return fuzzResultRepository.findAll();
     }
 
+    @PostMapping("/fuzz-all")
+    public String fuzzAll(@RequestParam String targetUrl) {
+        fuzzer.fuzzAll(targetUrl);
+        return "Fuzzing All initiated for " + targetUrl;
+    }
 }
