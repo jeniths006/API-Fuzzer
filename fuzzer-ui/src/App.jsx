@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { getResults } from './services/ApiService';
+import {fuzzPayload, getResults} from './services/ApiService';
 
 function App() {
   const [results, setResults] = useState([]);
+  const [targetUrl, setTargetUrl] = useState("");
+  const [message, setMessage] = useState("");
 
   const fetchData = async () => {
     try {
@@ -12,6 +14,20 @@ function App() {
       console.error("Error fetching results:", error);
     }
   };
+
+  const startScan = async () => {
+      if (!targetUrl.trim() || targetUrl == null) {
+          setMessage("Please enter a valid URL");
+          return;
+      }
+      try {
+          await fuzzPayload(targetUrl);
+          setMessage("Scan started successfully");
+      } catch (error) {
+          setMessage("Error starting scan");
+      }
+
+  }
 
   useEffect(() => {
     fetchData();
@@ -25,6 +41,15 @@ function App() {
             Refresh Data
           </button>
         </div>
+
+        <label>
+          Target Url: <input type="url" name="targetUrlInput" onChange={e => setTargetUrl(e.target.value)}/>
+        </label>
+        <p>Current URl: {targetUrl}</p>
+          <button onClick={startScan}>
+              Start Scan
+          </button>
+          <p>{message}</p>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
