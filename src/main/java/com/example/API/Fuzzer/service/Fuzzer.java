@@ -32,21 +32,33 @@ public class Fuzzer {
                 .bodyValue(payload.getContent())
                 .retrieve()
                 .toEntity(String.class)
+
                 .subscribe(entity -> {
                     long endTime = System.currentTimeMillis();
                     FuzzResult result = new FuzzResult();
                     result.setTargetUrl(targetUrl);
                     result.setPayloadContent(payload.getContent());
+                    result.setPayloadCategory(payload.getCategory());
                     result.setStatusCode(entity.getStatusCode().value());
                     result.setResponseBody(entity.getBody());
                     long responseSize = entity.getBody() != null ? entity.getBody().length() : 0;
                     result.setResponseSize(responseSize);
                     long responseTime = endTime - startTime;
                     result.setResponseTime(responseTime);
+
+                    fuzzResultRepository.save(result);
+                    }, error -> {
+
+                    FuzzResult result = new FuzzResult();
+                    result.setTargetUrl(targetUrl);
+                    result.setPayloadContent(payload.getContent());
                     result.setPayloadCategory(payload.getCategory());
+                    result.setStatusCode(-1);
+                    result.setResponseBody(error.getMessage());
                     fuzzResultRepository.save(result);
 
-                        }
+                    }
+
                 );
     }
 
