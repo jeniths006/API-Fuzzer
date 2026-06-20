@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {fuzzPayload, getResults} from './services/ApiService';
+import { fuzzPayload, getResults } from './services/ApiService';
 
 function App() {
   const [results, setResults] = useState([]);
@@ -16,66 +16,107 @@ function App() {
   };
 
   const startScan = async () => {
-      if (!targetUrl.trim() || targetUrl == null) {
-          setMessage("Please enter a valid URL");
-          return;
-      }
-      try {
-          await fuzzPayload(targetUrl);
-          setMessage("Scan started successfully");
-      } catch (error) {
-          setMessage("Error starting scan");
-      }
+    if (!targetUrl.trim() || targetUrl == null) {
+      setMessage("Please enter a valid URL");
+      return;
+    }
 
-  }
+    try {
+      await fuzzPayload(targetUrl);
+      setMessage("Scan started successfully");
+    } catch (error) {
+      setMessage("Error starting scan");
+    }
+  };
 
   useEffect(() => {
     fetchData();
   }, []);
 
   return (
-      <div className="min-h-screen bg-gray-900 p-8 text-white">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold">Fuzzer Dashboard</h1>
-          <button onClick={fetchData} className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-500">
-            Refresh Data
+    <div className="min-h-screen bg-gray-950 text-white p-6">
+      <div className="max-w-6xl mx-auto bg-gray-900/40 border border-gray-800 rounded-xl p-6 shadow-lg">
+        {/* HEADER */}
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold tracking-tight">
+            API Fuzzer
+          </h1>
+
+          <p className="text-gray-400 text-sm mt-1">
+            Security testing dashboard for payload-based API fuzzing
+          </p>
+        </div>
+
+        {/* INPUT ROW */}
+        <div className="flex gap-3 items-center mb-6 p-3 bg-gray-900 rounded-lg border border-gray-800">
+          <input
+            type="url"
+            placeholder="Enter target URL..."
+            className="flex-1 p-2 rounded bg-gray-950 border border-gray-700 text-sm focus:outline-none focus:border-blue-500"
+            onChange={(e) => setTargetUrl(e.target.value)}
+          />
+
+          <button
+            onClick={startScan}
+            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold text-sm transition"
+          >
+            Start Scan
           </button>
         </div>
 
-        <label>
-          Target Url: <input type="url" name="targetUrlInput" onChange={e => setTargetUrl(e.target.value)}/>
-        </label>
-        <p>Current URl: {targetUrl}</p>
-          <button onClick={startScan}>
-              Start Scan
-          </button>
-          <p>{message}</p>
+        {/* MESSAGE */}
+        {message && (
+          <div className="mb-6 p-3 rounded-lg bg-gray-950 border border-gray-800 text-sm text-gray-300">
+            {message}
+          </div>
+        )}
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-            <tr className="border-b border-gray-700 bg-gray-800 text-gray-400">
-              <th className="p-4">ID</th>
-              <th className="p-4">Target URL</th>
-              <th className="p-4">Payload</th>
-              <th className="p-4">Status</th>
-            </tr>
+        {/* TABLE */}
+        <div className="rounded-xl overflow-hidden border border-gray-800">
+          <table className="w-full text-left">
+            <thead className="bg-gray-950 text-gray-400 text-xs uppercase tracking-wider">
+              <tr className="border-t border-gray-800 hover:bg-gray-900/60 transition">
+                <th className="p-3">ID</th>
+                <th className="p-3">Target URL</th>
+                <th className="p-3">Payload</th>
+                <th className="p-3">Status</th>
+              </tr>
             </thead>
+
             <tbody>
-            {results.map((res) => (
-                <tr key={res.id} className="border-b border-gray-700 hover:bg-gray-800">
-                  <td className="p-4">{res.id}</td>
-                  <td className="p-4 text-blue-400 font-mono text-sm">{res.targetUrl}</td>
-                  <td className="p-4">{res.payloadContent}</td>
-                  <td className={`p-4 font-bold ${res.statusCode === 200 ? 'text-green-500' : 'text-red-500'}`}>
-                    {res.statusCode}
+              {results.map((res) => (
+                <tr
+                  key={res.id}
+                  className="border-t border-gray-800 hover:bg-gray-900"
+                >
+                  <td className="p-3">{res.id}</td>
+
+                  <td className="p-3 font-mono text-xs text-blue-300">
+                    {res.targetUrl}
+                  </td>
+
+                  <td className="p-3">
+                    {res.payloadContent}
+                  </td>
+
+                  <td className="p-3">
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-semibold ${
+                        res.statusCode === 200
+                          ? "bg-green-900 text-green-300"
+                          : "bg-red-900 text-red-300"
+                      }`}
+                    >
+                      {res.statusCode}
+                    </span>
                   </td>
                 </tr>
-            ))}
+              ))}
             </tbody>
           </table>
         </div>
       </div>
+    </div>
   );
 }
 
