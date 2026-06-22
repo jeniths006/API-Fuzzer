@@ -19,4 +19,7 @@ public class FuzzResult {
     private long responseTime;
     private long responseSize;
     private String payloadCategory;
+
+    private String httpMethod;
+    private long timestamp;
 }

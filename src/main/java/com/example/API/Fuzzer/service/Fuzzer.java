@@ -45,7 +45,8 @@ public class Fuzzer {
                     result.setResponseSize(responseSize);
                     long responseTime = endTime - startTime;
                     result.setResponseTime(responseTime);
-
+                    result.setHttpMethod("POST");
+                    result.setTimestamp(System.currentTimeMillis());
                     fuzzResultRepository.save(result);
                     }, error -> {
 
@@ -55,6 +56,8 @@ public class Fuzzer {
                     result.setPayloadCategory(payload.getCategory());
                     result.setStatusCode(-1);
                     result.setResponseBody(error.getMessage());
+                    result.setHttpMethod("POST");
+                    result.setTimestamp(System.currentTimeMillis());
                     fuzzResultRepository.save(result);
 
                     }

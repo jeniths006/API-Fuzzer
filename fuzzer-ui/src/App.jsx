@@ -5,6 +5,7 @@ function App() {
   const [results, setResults] = useState([]);
   const [targetUrl, setTargetUrl] = useState("");
   const [message, setMessage] = useState("");
+  const [selectedResult, setSelectedResult] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -28,6 +29,12 @@ function App() {
       setMessage("Error starting scan");
     }
   };
+
+  const getRowColor = (res) => {
+      if (res.statusCode >= 500) return "bg-red-900/30";
+      if (res.responseTime > 500) return "bg-yellow-900/20";
+      return "";
+  }
 
   useEffect(() => {
     fetchData();
@@ -75,19 +82,22 @@ function App() {
         <div className="rounded-xl overflow-hidden border border-gray-800">
           <table className="w-full text-left">
             <thead className="bg-gray-950 text-gray-400 text-xs uppercase tracking-wider">
-              <tr className="border-t border-gray-800 hover:bg-gray-900/60 transition">
+                <tr>
                 <th className="p-3">ID</th>
                 <th className="p-3">Target URL</th>
                 <th className="p-3">Payload</th>
                 <th className="p-3">Status</th>
+                <th className="p-3">Method</th>
+                <th className="p-3">Time</th>
               </tr>
             </thead>
 
             <tbody>
               {results.map((res) => (
                 <tr
-                  key={res.id}
-                  className="border-t border-gray-800 hover:bg-gray-900"
+                    key={res.id}
+                    onClick={() => setSelectedResult(res)}
+                    className={`border-t border-gray-800 hover:bg-gray-900/60 transition cursor-pointer ${getRowColor(res)}`}
                 >
                   <td className="p-3">{res.id}</td>
 
@@ -110,6 +120,8 @@ function App() {
                       {res.statusCode}
                     </span>
                   </td>
+                  <td>{res.httpMethod}</td>
+                  <td>{new Date(res.timestamp).toLocaleTimeString()}</td>
                 </tr>
               ))}
             </tbody>
