@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class Fuzzer {
@@ -25,7 +26,7 @@ public class Fuzzer {
 
     private final WebClient webClient = WebClient.builder().build();
 
-    public void fuzz(String targetUrl, AttackPayload payload) {
+    public void fuzz(String targetUrl, AttackPayload payload, UUID scanId) {
         long startTime = System.currentTimeMillis();
         webClient.post()
                 .uri(targetUrl)
@@ -47,6 +48,7 @@ public class Fuzzer {
                     result.setResponseTime(responseTime);
                     result.setHttpMethod("POST");
                     result.setTimestamp(System.currentTimeMillis());
+                    result.setScanId(scanId);
                     fuzzResultRepository.save(result);
                     }, error -> {
 
@@ -58,6 +60,7 @@ public class Fuzzer {
                     result.setResponseBody(error.getMessage());
                     result.setHttpMethod("POST");
                     result.setTimestamp(System.currentTimeMillis());
+                    result.setScanId(scanId);
                     fuzzResultRepository.save(result);
 
                     }
@@ -66,9 +69,10 @@ public class Fuzzer {
     }
 
     public void fuzzAll(String url) {
+        UUID scanId = UUID.randomUUID();
         List<AttackPayload> payloads = attackPayloadRepository.findAll();
         for (AttackPayload payload : payloads) {
-            fuzz(url, payload);
+            fuzz(url, payload, scanId);
 
         }
     }

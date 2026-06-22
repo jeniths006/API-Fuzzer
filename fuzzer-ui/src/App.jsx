@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { fuzzPayload, getResults } from './services/ApiService';
+import {fuzzPayload, getResults, getScanResults} from './services/ApiService';
 
 function App() {
   const [results, setResults] = useState([]);
   const [targetUrl, setTargetUrl] = useState("");
   const [message, setMessage] = useState("");
   const [selectedResult, setSelectedResult] = useState(null);
+  const [scanId, setScanId] = useState("");
 
   const fetchData = async () => {
     try {
@@ -15,6 +16,21 @@ function App() {
       console.error("Error fetching results:", error);
     }
   };
+
+  const fetchScanResults = async () => {
+    if (!scanId.trim() || scanId == null) {
+      setMessage("Please enter a valid scan ID");
+      return;
+    }
+
+    try {
+      const response = await getScanResults(scanId);
+      setResults(response.data);
+    } catch (error) {
+      setMessage("Error fetching scan results");
+    }
+  }
+
 
   const startScan = async () => {
     if (!targetUrl.trim() || targetUrl == null) {
@@ -29,6 +45,8 @@ function App() {
       setMessage("Error starting scan");
     }
   };
+
+
 
   const getRowColor = (res) => {
       if (res.statusCode >= 500) return "bg-red-900/30";
@@ -77,6 +95,20 @@ function App() {
             {message}
           </div>
         )}
+
+        <input
+          type="text"
+          placeholder="Enter Scan ID..."
+          className="flex-1 p-2 rounded bg-gray-950 border border-gray-700 text-sm focus:outline-none focus:border-blue-500"
+          onChange={(e) => setScanId(e.target.value)}
+         />
+
+        <button
+          onClick={fetchScanResults}
+          className="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded font-semibold text-sm transition"
+         >
+          Show Scan Results
+        </button>
 
         {/* TABLE */}
         <div className="rounded-xl overflow-hidden border border-gray-800">

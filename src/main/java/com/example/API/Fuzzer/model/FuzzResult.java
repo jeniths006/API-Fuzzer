@@ -3,6 +3,8 @@ package com.example.API.Fuzzer.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Entity
 @Getter
 @Setter
@@ -22,4 +24,6 @@ public class FuzzResult {
 
     private String httpMethod;
     private long timestamp;
+
+    private UUID scanId;
 }

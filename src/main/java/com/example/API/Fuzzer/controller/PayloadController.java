@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
@@ -52,8 +53,9 @@ public class PayloadController {
 
     @PostMapping("/fuzz/{id}")
     public String fuzz(@PathVariable Long id, @RequestParam String targetUrl) {
+        UUID scanId = UUID.randomUUID();
         AttackPayload payload = payloadService.getPayloadById(id);
-        fuzzer.fuzz(targetUrl, payload);
+        fuzzer.fuzz(targetUrl, payload, scanId);
         return "Fuzzing attack initiated for payload ID: " + id + " against " + targetUrl;
     }
 
@@ -66,5 +68,10 @@ public class PayloadController {
     public String fuzzAll(@RequestParam String targetUrl) {
         fuzzer.fuzzAll(targetUrl);
         return "Fuzzing All initiated for " + targetUrl;
+    }
+
+    @GetMapping("/results/scan/{scanId}")
+    public List<FuzzResult> getResultsByScanId(@PathVariable UUID scanId) {
+        return fuzzResultRepository.findByscanId(scanId);
     }
 }
