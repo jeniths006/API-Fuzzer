@@ -16,8 +16,7 @@ public class FuzzResult {
     private String targetUrl;
     private String payloadContent;
     private int statusCode;
-        @Column(columnDefinition = "TEXT")
-        private String responseBody;
+    private String responseBody;
 
     private long responseTime;
     private long responseSize;

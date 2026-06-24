@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,7 +48,7 @@ public class Fuzzer {
                     long responseTime = endTime - startTime;
                     result.setResponseTime(responseTime);
                     result.setHttpMethod("POST");
-                    result.setTimestamp(System.currentTimeMillis());
+                    result.setTimestamp(LocalDateTime.now());
                     result.setScanId(scanId);
                     fuzzResultRepository.save(result);
                     }, error -> {
@@ -59,7 +60,7 @@ public class Fuzzer {
                     result.setStatusCode(-1);
                     result.setResponseBody(error.getMessage());
                     result.setHttpMethod("POST");
-                    result.setTimestamp(System.currentTimeMillis());
+                    result.setTimestamp(LocalDateTime.now());
                     result.setScanId(scanId);
                     fuzzResultRepository.save(result);
 
