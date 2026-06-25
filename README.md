@@ -1,125 +1,222 @@
 # API Fuzzer
 
-API Fuzzer is an early-stage Spring Boot project for testing how APIs respond to security-focused payloads. It stores reusable attack payloads, sends selected payloads to a target endpoint, and records the HTTP response data for later review.
+A modern web-based API security testing platform designed to automate fuzzing, payload injection, response analysis, and vulnerability discovery across REST APIs.
 
-The goal is to grow this into a larger API security testing tool for controlled environments, such as personal projects, lab targets, and APIs where testing is explicitly authorized.
+## Overview
 
-## Current Features
+API Fuzzer helps security researchers, developers, and penetration testers identify potential vulnerabilities in web APIs by automatically injecting malicious payloads and analysing responses for unusual behaviour.
 
-- Store attack payloads with a name, content, and category.
-- List, add, and delete saved payloads.
-- Send a saved payload to a target URL using an HTTP POST request.
-- Persist fuzzing results, including target URL, payload content, status code, and response body.
-- Use PostgreSQL for persistence through Spring Data JPA.
+The platform supports large-scale automated testing while providing a clean dashboard for scan management and result analysis.
 
-## Tech Stack
+---
 
-- Java 21
-- Spring Boot
-- Spring Web MVC
-- Spring WebFlux `WebClient`
-- Spring Data JPA
-- PostgreSQL
-- Gradle
-- Docker Compose
+## Features
+
+### Automated API Fuzzing
+
+* Send payloads against any HTTP endpoint
+* Support for GET, POST, PUT, PATCH and DELETE requests
+* Configurable target URLs
+* Automated payload execution
+
+### Payload Management
+
+* Persistent payload storage
+* Categorised payload libraries
+* Custom payload creation
+* Seeded vulnerability payload database
+
+Supported categories include:
+
+* SQL Injection
+* Cross-Site Scripting (XSS)
+* Command Injection
+* Path Traversal
+* SSRF
+* Custom Payloads
+
+### Scan Management
+
+* Unique scan IDs for every fuzzing session
+* Scan grouping and tracking
+* Historical scan retrieval
+* Scan-specific result filtering
+
+### Response Analysis
+
+The platform records:
+
+* HTTP Status Codes
+* Response Times
+* Response Sizes
+* Response Bodies
+* Request Methods
+* Payload Categories
+* Target Endpoints
+
+### Result Dashboard
+
+* Real-time result monitoring
+* Historical result browsing
+* Scan-specific views
+* Detailed response inspection
+
+### Data Persistence
+
+All scans, payloads and results are stored in PostgreSQL for long-term analysis and reporting.
+
+---
+
+## Technology Stack
+
+### Backend
+
+* Java
+* Spring Boot
+* Spring Data JPA
+* Hibernate
+* Flyway
+* PostgreSQL
+
+### Frontend
+
+* React
+* React Router
+* Axios
+* Tailwind CSS
+* Vite
+
+### Database
+
+* PostgreSQL
+
+### Build Tools
+
+* Gradle
+* npm
+
+---
+
+## Architecture
+
+Frontend (React)
+
+↓
+
+REST API
+
+↓
+
+Spring Boot Backend
+
+↓
+
+PostgreSQL Database
+
+---
+
+## Database Schema
+
+### attack_payload
+
+Stores reusable attack payloads.
+
+| Field    | Type   |
+| -------- | ------ |
+| id       | SERIAL |
+| name     | TEXT   |
+| content  | TEXT   |
+| category | TEXT   |
+
+### fuzz_result
+
+Stores results generated during scans.
+
+| Field           | Type      |
+| --------------- | --------- |
+| id              | SERIAL    |
+| targetUrl       | TEXT      |
+| payloadContent  | TEXT      |
+| statusCode      | INTEGER   |
+| responseBody    | TEXT      |
+| responseTime    | BIGINT    |
+| responseSize    | BIGINT    |
+| payloadCategory | TEXT      |
+| httpMethod      | TEXT      |
+| timestamp       | TIMESTAMP |
+| scanId          | UUID      |
+
+---
+
+## Security Use Cases
+
+API Fuzzer can be used to test for:
+
+* SQL Injection
+* Cross-Site Scripting
+* Command Injection
+* Path Traversal
+* Server-Side Request Forgery
+* Error Disclosure
+* Input Validation Issues
+* Unexpected Response Behaviour
+
+---
+
+## Future Enhancements
+
+* Authentication support
+* JWT handling
+* OpenAPI/Swagger import
+* Multi-threaded scanning
+* Automated vulnerability detection
+* Report generation
+* Scan scheduling
+* Role-based access control
+* Docker deployment
+* Kubernetes support
+
+---
 
 ## Getting Started
 
-### Prerequisites
+### Backend
 
-- Java 21
-- Docker Desktop, for the PostgreSQL database
-- Git
+```bash
+git clone https://github.com/yourusername/API-Fuzzer.git
 
-### Start PostgreSQL
+cd API-Fuzzer
 
-```powershell
-docker compose up -d
+./gradlew bootRun
 ```
 
-The app expects PostgreSQL to be available at:
+### Frontend
 
-```text
-jdbc:postgresql://localhost:5432/fuzzerdb
+```bash
+cd fuzzer-ui
+
+npm install
+
+npm run dev
 ```
 
-Default local credentials are configured in `src/main/resources/application.properties`:
+### Database
 
-```text
-username: user
-password: password
-database: fuzzerdb
+Configure PostgreSQL connection details in:
+
+```properties
+application.properties
 ```
 
-### Run the Application
+Flyway migrations will automatically initialise the database.
 
-```powershell
-.\gradlew.bat bootRun
+---
+
+## Disclaimer
+
+This project is intended for educational, research and authorised security testing purposes only.
+
+Only test systems you own or have explicit permission to assess.
+
 ```
-
-By default, the API runs on:
-
-```text
-http://localhost:8080
 ```
-
-### Run Tests
-
-```powershell
-.\gradlew.bat test
-```
-
-## API Endpoints
-
-### List Payloads
-
-```http
-GET /api/payloads
-```
-
-### Add Payload
-
-```http
-POST /api/payloads
-Content-Type: application/json
-
-{
-  "name": "Basic SQL Injection",
-  "content": "' OR '1'='1",
-  "category": "sql-injection"
-}
-```
-
-### Delete Payload
-
-```http
-DELETE /api/payloads/{id}
-```
-
-### Fuzz a Target URL
-
-```http
-POST /api/payloads/fuzz/{id}?targetUrl=http://localhost:3000/test
-```
-
-This sends the selected payload as the POST body to the supplied `targetUrl`.
-
-### List Fuzzing Results
-
-```http
-GET /api/payloads/results
-```
-
-## Roadmap
-
-- Add request method, headers, and body format configuration.
-- Add payload categories and seed payload libraries.
-- Add response analysis for common security signals.
-- Add timeout, retry, and error handling for failed requests.
-- Add authentication support for testing protected APIs.
-- Add a UI for managing payloads and reviewing results.
-- Add report export for fuzzing sessions.
-
-## Responsible Use
-
-Only run this tool against APIs you own or have explicit permission to test. API fuzzing can cause unexpected load, trigger security alerts, corrupt test data, or expose vulnerabilities. Keep testing scoped, logged, and isolated from production systems unless authorization and safeguards are in place.
