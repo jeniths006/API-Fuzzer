@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScanPage from "./pages/ScanPage.jsx";
 import ResultsPage from "./pages/ResultsPage.jsx";
 import Sidebar from "./components/Sidebar.jsx";
+import ScanResultsPage from "./pages/ScanResultsPage.jsx";
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                             <Routes>
                                 <Route path="/" element={<ScanPage />} />
                                 <Route path="/results" element={<ResultsPage />} />
+                                <Route path="/results/:scanId" element={<ScanResultsPage />} />
                             </Routes>
                         </div>
 
