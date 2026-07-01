@@ -6,6 +6,7 @@ import com.example.API.Fuzzer.exception.EmailAlreadyExistsException;
 import com.example.API.Fuzzer.exception.UsernameAlreadyExistsException;
 import com.example.API.Fuzzer.model.User;
 import com.example.API.Fuzzer.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,9 +14,13 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private PasswordEncoder passwordEncoder;
+
+
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponseDTO registerUser(RegisterRequestDTO user) {
@@ -30,7 +35,7 @@ public class UserService {
         newUser.setUsername(user.getUsername());
         newUser.setName(user.getName());
         newUser.setEmail(user.getEmail());
-        newUser.setPassword(user.getPassword());
+        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
 
 
         User savedUser = userRepository.save(newUser);
