@@ -2,6 +2,8 @@ package com.example.API.Fuzzer.service;
 
 import com.example.API.Fuzzer.dto.RegisterRequestDTO;
 import com.example.API.Fuzzer.dto.UserResponseDTO;
+import com.example.API.Fuzzer.exception.EmailAlreadyExistsException;
+import com.example.API.Fuzzer.exception.UsernameAlreadyExistsException;
 import com.example.API.Fuzzer.model.User;
 import com.example.API.Fuzzer.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,11 +20,11 @@ public class UserService {
 
     public UserResponseDTO registerUser(RegisterRequestDTO user) {
         if(userRepository.findByUsername(user.getUsername()).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists");
         }
 
         if(userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already exists");
+            throw new EmailAlreadyExistsException("Email already exists");
         }
         User newUser = new User();
         newUser.setUsername(user.getUsername());
