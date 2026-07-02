@@ -4,12 +4,14 @@ import com.example.API.Fuzzer.dto.RegisterRequestDTO;
 import com.example.API.Fuzzer.dto.UserResponseDTO;
 import com.example.API.Fuzzer.model.User;
 import com.example.API.Fuzzer.repository.UserRepository;
+import com.example.API.Fuzzer.security.JwtUtil;
 import com.example.API.Fuzzer.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -25,6 +27,12 @@ class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @Test
     void registerUserSuccessfully() {
@@ -51,6 +59,9 @@ class UserServiceTest {
 
         when(userRepository.save(any(User.class)))
                 .thenReturn(savedUser);
+
+        when(passwordEncoder.encode(request.getPassword()))
+                .thenReturn("encodedPassword");
 
         UserResponseDTO response = userService.registerUser(request);
 
