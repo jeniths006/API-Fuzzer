@@ -1,6 +1,7 @@
 package com.example.API.Fuzzer.service;
 
 import com.example.API.Fuzzer.dto.LoginRequestDTO;
+import com.example.API.Fuzzer.dto.LoginResponseDTO;
 import com.example.API.Fuzzer.dto.RegisterRequestDTO;
 import com.example.API.Fuzzer.dto.UserResponseDTO;
 import com.example.API.Fuzzer.exception.EmailAlreadyExistsException;
@@ -10,6 +11,7 @@ import com.example.API.Fuzzer.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import com.example.API.Fuzzer.security.JwtUtil;
 
 @Service
 public class UserService {
@@ -18,11 +20,13 @@ public class UserService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final JwtUtil jwtUtil;
 
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
 
     }
 
@@ -51,7 +55,7 @@ public class UserService {
         return response;
     }
 
-    public UserResponseDTO login(LoginRequestDTO user) {
+    public LoginResponseDTO login(LoginRequestDTO user) {
         User userFromDB = userRepository.findByUsername(user.getUsername())
                 .orElseThrow(() -> new RuntimeException("Incorrect username or password"));
 
@@ -59,11 +63,10 @@ public class UserService {
             throw new RuntimeException("Incorrect username or password");
         }
 
-        UserResponseDTO response = new UserResponseDTO(
-                userFromDB.getId(),
-                userFromDB.getUsername(),
-                userFromDB.getName(),
-                userFromDB.getEmail()
+        String token = jwtUtil.generateToken(userFromDB);
+        LoginResponseDTO response = new LoginResponseDTO(
+                token,
+                userFromDB.getUsername()
         );
 
         return response;

@@ -1,6 +1,8 @@
 package com.example.API.Fuzzer.controller;
 
 
+import com.example.API.Fuzzer.dto.LoginRequestDTO;
+import com.example.API.Fuzzer.dto.LoginResponseDTO;
 import com.example.API.Fuzzer.dto.RegisterRequestDTO;
 import com.example.API.Fuzzer.dto.UserResponseDTO;
 import com.example.API.Fuzzer.model.User;
@@ -25,5 +27,10 @@ public class UserController {
     public UserResponseDTO registerUser(@RequestBody @Valid RegisterRequestDTO user) {
         return userService.registerUser(user);
 
+    }
+
+    @PostMapping("/login")
+    public LoginResponseDTO loginUser(@RequestBody LoginRequestDTO user) {
+        return userService.login(user);
     }
 }
