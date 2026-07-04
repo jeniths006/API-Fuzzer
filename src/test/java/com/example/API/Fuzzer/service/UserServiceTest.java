@@ -1,11 +1,12 @@
-package com.example.API.Fuzzer.controller;
+package com.example.API.Fuzzer.service;
 
+import com.example.API.Fuzzer.dto.LoginRequestDTO;
+import com.example.API.Fuzzer.dto.LoginResponseDTO;
 import com.example.API.Fuzzer.dto.RegisterRequestDTO;
 import com.example.API.Fuzzer.dto.UserResponseDTO;
 import com.example.API.Fuzzer.model.User;
 import com.example.API.Fuzzer.repository.UserRepository;
 import com.example.API.Fuzzer.security.JwtUtil;
-import com.example.API.Fuzzer.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -127,5 +128,39 @@ class UserServiceTest {
         assertEquals("Email already exists", exception.getMessage());
 
         verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void loginSuccessfully() {
+        LoginRequestDTO request = new LoginRequestDTO(
+                "jenith",
+                "Password@123"
+        );
+
+        User savedUser = new User();
+        savedUser.setId(1L);
+        savedUser.setUsername(request.getUsername());
+        savedUser.setName("jenith");
+        savedUser.setEmail("jenith@test.com");
+        savedUser.setPassword("$2a$12$jQ9TpjULCJR4.IAT39Mnr.EJg1PgJb1WZ8CM7yNzcqAwyvqXk1XJW");
+
+        when(userRepository.findByUsername(request.getUsername()))
+                .thenReturn(Optional.of(savedUser));
+
+        when(passwordEncoder.matches(request.getPassword(), savedUser.getPassword()))
+                .thenReturn(true);
+
+        String token = "token";
+        when(jwtUtil.generateToken(savedUser))
+                .thenReturn(token);
+
+        LoginResponseDTO response = userService.login(request);
+
+        assertEquals(token, response.getToken());
+        assertEquals("jenith", response.getUsername());
+
+        verify(userRepository, times(1)).findByUsername(request.getUsername());
+        verify(passwordEncoder, times(1)).matches(request.getPassword(), savedUser.getPassword());
+        verify(jwtUtil, times(1)).generateToken(savedUser);
     }
 }
