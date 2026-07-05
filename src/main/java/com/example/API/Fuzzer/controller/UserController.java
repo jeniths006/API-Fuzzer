@@ -9,10 +9,9 @@ import com.example.API.Fuzzer.model.User;
 import com.example.API.Fuzzer.service.UserService;
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,5 +31,19 @@ public class UserController {
     @PostMapping("/login")
     public LoginResponseDTO loginUser(@RequestBody LoginRequestDTO user) {
         return userService.login(user);
+    }
+
+    @GetMapping("/me")
+    public UserResponseDTO getLoggedInUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        UserResponseDTO response = new UserResponseDTO(
+                user.getId(),
+                user.getUsername(),
+                user.getName(),
+                user.getEmail()
+        );
+        return response;
     }
 }

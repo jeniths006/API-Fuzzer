@@ -1,8 +1,11 @@
 package com.example.API.Fuzzer.controller;
 
 
+import com.example.API.Fuzzer.dto.UserResponseDTO;
 import com.example.API.Fuzzer.repository.AttackPayloadRepository;
 import com.example.API.Fuzzer.repository.FuzzResultRepository;
+import com.example.API.Fuzzer.repository.UserRepository;
+import com.example.API.Fuzzer.security.JwtUtil;
 import com.example.API.Fuzzer.service.Fuzzer;
 import com.example.API.Fuzzer.service.PayloadService;
 import org.junit.jupiter.api.Test;
@@ -35,6 +38,12 @@ public class PayloadControllerTest {
 
     @MockitoBean
     private Fuzzer fuzzer;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Test
     void shouldStartFuzzScan() throws Exception {
