@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
 }
 
 group = 'com.example'
@@ -15,6 +16,15 @@ java {
 
 repositories {
 	mavenCentral()
+}
+
+jacocoTestReport {
+	dependsOn test // Makes sure tests run before generating the report
+
+	reports {
+		xml.required = true  // CRUCIAL: Codecov needs the XML format
+		html.required = true // Optional: Keeps the local HTML report for you
+	}
 }
 
 dependencies {
@@ -42,6 +52,11 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
 }
 
 tasks.named('test') {
