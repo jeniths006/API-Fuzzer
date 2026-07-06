@@ -51,14 +51,6 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
         fail_ci_if_error: true
 
-    - name: Add Coverage Summary to GitHub Actions Page
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      with:
-        filename: build/reports/jacoco/test/jacocoTestReport.xml
-        badge: true
-        fail_below_min: false
-        format: markdown
-        output: both
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
