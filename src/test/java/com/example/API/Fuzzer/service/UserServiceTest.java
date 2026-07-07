@@ -163,4 +163,58 @@ class UserServiceTest {
         verify(passwordEncoder, times(1)).matches(request.getPassword(), savedUser.getPassword());
         verify(jwtUtil, times(1)).generateToken(savedUser);
     }
+
+    @Test
+    void loginUserNotFound() {
+        LoginRequestDTO request = new LoginRequestDTO(
+                "unknownUser",
+                "Password@123"
+        );
+
+        when(userRepository.findByUsername(request.getUsername()))
+                .thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> userService.login(request)
+
+        );
+
+        assertEquals("Incorrect username or password", exception.getMessage());
+
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(jwtUtil, never()).generateToken(any());
+
+    }
+
+    @Test
+    void loginIncorrectPassword() {
+        LoginRequestDTO request = new LoginRequestDTO(
+                "jenith",
+                "wrongPassword"
+        );
+
+        User user = new User();
+        user.setUsername("jenith");
+        user.setPassword("encodedPassword");
+
+        when(userRepository.findByUsername(request.getUsername()))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches(request.getPassword(), user.getPassword()))
+                .thenReturn(false);
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> userService.login(request)
+        );
+
+        assertEquals("Incorrect username or password", exception.getMessage());
+
+        verify(jwtUtil, never()).generateToken(any());
+    }
+
+
+
+
 }
