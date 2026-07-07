@@ -24,22 +24,22 @@ public class AuthenticationServiceTest {
     @Test
     void getCurrentUserReturnsAuthenticatedUser() {
 
-        User user = new User();
+        final User user = new User();
         user.setId(1L);
         user.setUsername("jenith");
         user.setName("Jenith");
         user.setEmail("jenith@test.com");
 
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+        final UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 user,
                 null,
                 Collections.emptyList()
         );
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        final SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        User currentUser  = authenticationService.getCurrentUser();
+        final User currentUser  = authenticationService.getCurrentUser();
         assertSame(user, currentUser);
     }
 
