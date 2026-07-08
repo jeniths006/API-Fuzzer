@@ -17,9 +17,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -122,7 +128,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(request.getEmail()))
                 .thenReturn(Optional.of(existingUser));
 
-        RuntimeException exception = assertThrows(
+        final RuntimeException exception = assertThrows(
                 RuntimeException.class,
                 () -> userService.registerUser(request)
         );
