@@ -59,4 +59,14 @@ public class PayloadControllerTest {
 
         verify(fuzzer).fuzzAll(url);
     }
+
+    @Test
+    void shouldHandleCorsPreflight() throws Exception {
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options("/api/payloads/fuzz-all")
+                        .header("Access-Control-Request-Method", "POST")
+                        .header("Origin", "http://localhost:5173"))
+                .andExpect(status().isOk())
+                .andExpect(header().exists("Access-Control-Allow-Origin"))
+                .andExpect(header().string("Access-Control-Allow-Origin", "http://localhost:5173"));
+    }
 }
