@@ -16,9 +16,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
+
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -38,7 +46,7 @@ class UserServiceTest {
     @Test
     void registerUserSuccessfully() {
 
-        RegisterRequestDTO request = new RegisterRequestDTO(
+        final RegisterRequestDTO request = new RegisterRequestDTO(
                 "jenith",
                 "Jenith",
                 "jenith@test.com",
@@ -51,7 +59,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(request.getEmail()))
                 .thenReturn(Optional.empty());
 
-        User savedUser = new User();
+        final User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setUsername(request.getUsername());
         savedUser.setName(request.getName());
@@ -64,7 +72,7 @@ class UserServiceTest {
         when(passwordEncoder.encode(request.getPassword()))
                 .thenReturn("encodedPassword");
 
-        UserResponseDTO response = userService.registerUser(request);
+        final UserResponseDTO response = userService.registerUser(request);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
@@ -78,20 +86,20 @@ class UserServiceTest {
     @Test
     void registerUserUsernameAlreadyExists() {
 
-        RegisterRequestDTO request = new RegisterRequestDTO(
+        final RegisterRequestDTO request = new RegisterRequestDTO(
                 "jenith",
                 "Jenith",
                 "jenith@test.com",
                 "password123"
         );
 
-        User existingUser = new User();
+        final User existingUser = new User();
         existingUser.setUsername("jenith");
 
         when(userRepository.findByUsername(request.getUsername()))
                 .thenReturn(Optional.of(existingUser));
 
-        RuntimeException exception = assertThrows(
+        final RuntimeException exception = assertThrows(
                 RuntimeException.class,
                 () -> userService.registerUser(request)
         );
@@ -104,14 +112,14 @@ class UserServiceTest {
     @Test
     void registerUserEmailAlreadyExists() {
 
-        RegisterRequestDTO request = new RegisterRequestDTO(
+        final RegisterRequestDTO request = new RegisterRequestDTO(
                 "jenith",
                 "Jenith",
                 "jenith@test.com",
                 "password123"
         );
 
-        User existingUser = new User();
+        final User existingUser = new User();
         existingUser.setEmail("jenith@test.com");
 
         when(userRepository.findByUsername(request.getUsername()))
@@ -120,7 +128,7 @@ class UserServiceTest {
         when(userRepository.findByEmail(request.getEmail()))
                 .thenReturn(Optional.of(existingUser));
 
-        RuntimeException exception = assertThrows(
+        final RuntimeException exception = assertThrows(
                 RuntimeException.class,
                 () -> userService.registerUser(request)
         );
@@ -132,12 +140,12 @@ class UserServiceTest {
 
     @Test
     void loginSuccessfully() {
-        LoginRequestDTO request = new LoginRequestDTO(
+        final LoginRequestDTO request = new LoginRequestDTO(
                 "jenith",
                 "Password@123"
         );
 
-        User savedUser = new User();
+        final User savedUser = new User();
         savedUser.setId(1L);
         savedUser.setUsername(request.getUsername());
         savedUser.setName("jenith");
@@ -150,11 +158,11 @@ class UserServiceTest {
         when(passwordEncoder.matches(request.getPassword(), savedUser.getPassword()))
                 .thenReturn(true);
 
-        String token = "token";
+        final String token = "token";
         when(jwtUtil.generateToken(savedUser))
                 .thenReturn(token);
 
-        LoginResponseDTO response = userService.login(request);
+        final LoginResponseDTO response = userService.login(request);
 
         assertEquals(token, response.getToken());
         assertEquals("jenith", response.getUsername());
@@ -163,4 +171,58 @@ class UserServiceTest {
         verify(passwordEncoder, times(1)).matches(request.getPassword(), savedUser.getPassword());
         verify(jwtUtil, times(1)).generateToken(savedUser);
     }
+
+    @Test
+    void loginUserNotFound() {
+        final LoginRequestDTO request = new LoginRequestDTO(
+                "unknownUser",
+                "Password@123"
+        );
+
+        when(userRepository.findByUsername(request.getUsername()))
+                .thenReturn(Optional.empty());
+
+        final RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> userService.login(request)
+
+        );
+
+        assertEquals("Incorrect username or password", exception.getMessage());
+
+        verify(passwordEncoder, never()).matches(any(), any());
+        verify(jwtUtil, never()).generateToken(any());
+
+    }
+
+    @Test
+    void loginIncorrectPassword() {
+        final LoginRequestDTO request = new LoginRequestDTO(
+                "jenith",
+                "wrongPassword"
+        );
+
+        final User user = new User();
+        user.setUsername("jenith");
+        user.setPassword("encodedPassword");
+
+        when(userRepository.findByUsername(request.getUsername()))
+                .thenReturn(Optional.of(user));
+
+        when(passwordEncoder.matches(request.getPassword(), user.getPassword()))
+                .thenReturn(false);
+
+        final RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> userService.login(request)
+        );
+
+        assertEquals("Incorrect username or password", exception.getMessage());
+
+        verify(jwtUtil, never()).generateToken(any());
+    }
+
+
+
+
 }
