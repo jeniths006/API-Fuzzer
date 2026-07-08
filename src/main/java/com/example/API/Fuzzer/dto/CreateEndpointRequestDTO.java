@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class EndpointRequestDTO {
+public class CreateEndpointRequestDTO {
 
     @NotBlank(message = "Endpoint name is required")
     private String name;

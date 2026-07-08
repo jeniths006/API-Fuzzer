@@ -29,4 +29,8 @@ public class Project {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    public User getUser() {
+        return owner;
+    }
+
 }
