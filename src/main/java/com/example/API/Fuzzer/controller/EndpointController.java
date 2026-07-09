@@ -34,11 +34,11 @@ public class EndpointController {
                 .body(response);
     }
 
-    /*
+
 
     @GetMapping("/projects/{projectid}/endpoints")
     public ResponseEntity<List<EndpointResponseDTO>> getEndpoints(@PathVariable Long projectId) {
-        return ResponseEntity.ok(endpointService.getEndpoints(projectId))
+        return ResponseEntity.ok(endpointService.getEndpoints(projectId));
     }
 
     @GetMapping("/endpoints/{endpointId}")
@@ -65,6 +65,6 @@ public class EndpointController {
         return ResponseEntity.noContent().build();
     }
 
-    */
+
 
 }
