@@ -35,7 +35,7 @@ public class EndpointService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ProjectNotFoundException("Project not found"));
 
-        if(!project.getUser().getId().equals(currentUser.getId())) {
+        if(!project.getOwner().getId().equals(currentUser.getId())) {
             throw new UnauthorizedProjectAccessException("You are not authorized to access this project");
         }
 

@@ -22,7 +22,7 @@ public class EndpointController {
     }
 
 
-    @PostMapping("/projects/{projectid}/endpoints")
+    @PostMapping("/projects/{projectId}/endpoints")
     public ResponseEntity<EndpointResponseDTO> createEndpoint(
             @PathVariable Long projectId,
             @Valid @RequestBody CreateEndpointRequestDTO request) {
@@ -36,7 +36,7 @@ public class EndpointController {
 
 
 
-    @GetMapping("/projects/{projectid}/endpoints")
+    @GetMapping("/projects/{projectId}/endpoints")
     public ResponseEntity<List<EndpointResponseDTO>> getEndpoints(@PathVariable Long projectId) {
         return ResponseEntity.ok(endpointService.getEndpoints(projectId));
     }
@@ -49,7 +49,7 @@ public class EndpointController {
     }
 
 
-    @PutMapping("/api/endpoints/{endpointId}")
+    @PutMapping("/endpoints/{endpointId}")
     public ResponseEntity<EndpointResponseDTO> updateEndpoint(
             @PathVariable Long endpointId,
             @Valid @RequestBody CreateEndpointRequestDTO request) {
@@ -57,7 +57,7 @@ public class EndpointController {
         return ResponseEntity.ok(endpointService.updateEndpoint(endpointId, request));
     }
 
-    @DeleteMapping("/endpoints/{endpointid}")
+    @DeleteMapping("/endpoints/{endpointId}")
     public ResponseEntity<Void> deleteEndpoint(@PathVariable long endpointId) {
 
         endpointService.deleteEndpoint(endpointId);
