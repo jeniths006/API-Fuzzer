@@ -4,10 +4,14 @@ package com.example.API.Fuzzer.controller;
 import com.example.API.Fuzzer.dto.CreateEndpointRequestDTO;
 import com.example.API.Fuzzer.dto.EndpointResponseDTO;
 import com.example.API.Fuzzer.model.HttpMethod;
+import com.example.API.Fuzzer.model.User;
+import com.example.API.Fuzzer.repository.ProjectRepository;
 import com.example.API.Fuzzer.repository.UserRepository;
 import com.example.API.Fuzzer.security.JwtAuthenticationFilter;
 import com.example.API.Fuzzer.security.JwtUtil;
+import com.example.API.Fuzzer.service.AuthenticationService;
 import com.example.API.Fuzzer.service.EndpointService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
@@ -16,7 +20,8 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import com.fasterxml.jackson.databind.ObjectMapper; // Correct
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -39,7 +44,8 @@ public class EndpointControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @MockitoBean
     private EndpointService endpointService;
@@ -52,6 +58,19 @@ public class EndpointControllerTest {
 
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockitoBean
+    private AuthenticationService authenticationService;
+
+    @MockitoBean
+    private ProjectRepository projectRepository;
+
+    @BeforeEach
+    void setUp() {
+        User mockUser = new User();
+        mockUser.setId(1L);
+        when(authenticationService.getCurrentUser()).thenReturn(mockUser);
+    }
 
     @Test
     void createEndpointSuccessfully() throws Exception {
@@ -83,7 +102,7 @@ public class EndpointControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Login API"))
-                .andExpect(jsonPath("$.method").value("POST"))
+                .andExpect(jsonPath("$.httpMethod").value("POST"))
                 .andExpect(jsonPath("$.url").value("/api/login"));
 
         verify(endpointService).createEndpoint(eq(10L), any(CreateEndpointRequestDTO.class));
@@ -144,7 +163,7 @@ public class EndpointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Login API"))
-                .andExpect(jsonPath("$.method").value("POST"))
+                .andExpect(jsonPath("$.httpMethod").value("POST"))
                 .andExpect(jsonPath("$.url").value("/api/login"));
 
         verify(endpointService).getEndpoint(1L);
@@ -178,7 +197,7 @@ public class EndpointControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Updated Login"))
-                .andExpect(jsonPath("$.method").value("PUT"))
+                .andExpect(jsonPath("$.httpMethod").value("PUT"))
                 .andExpect(jsonPath("$.url").value("/api/login/update"));
 
         verify(endpointService).updateEndpoint(eq(1L), any(CreateEndpointRequestDTO.class));
