@@ -11,4 +11,5 @@ CREATE TABLE endpoint (
                       FOREIGN KEY (project_id)
                       REFERENCES projects(id)
                       ON DELETE CASCADE
+
 );

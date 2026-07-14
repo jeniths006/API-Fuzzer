@@ -24,10 +24,8 @@ import java.util.stream.Collectors;
 public class EndpointService {
 
     private final EndpointRepository endpointRepository;
-    private final ProjectService projectService;
     private final AuthenticationService authenticationService;
     private final ProjectRepository projectRepository;
-
     public EndpointResponseDTO createEndpoint(Long projectId, CreateEndpointRequestDTO request) {
         User currentUser = authenticationService.getCurrentUser();
 
@@ -49,16 +47,7 @@ public class EndpointService {
 
         Endpoint savedEndpoint = endpointRepository.save(endpoint);
 
-        EndpointResponseDTO response = new EndpointResponseDTO();
-        response.setId(savedEndpoint.getId());
-        response.setName(savedEndpoint.getName());
-        response.setHttpMethod(savedEndpoint.getMethod());
-        response.setUrl(savedEndpoint.getUrl());
-        response.setProjectId(savedEndpoint.getProject().getId());
-        response.setCreatedAt(now);
-        response.setUpdatedAt(now);
-
-        return response;
+        return mapToEndpointResponseDTO(savedEndpoint);
 
     }
     
