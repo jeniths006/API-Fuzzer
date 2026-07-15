@@ -1,69 +1,84 @@
 # API Fuzzer
 
-A modern web-based API security testing platform designed to automate fuzzing, payload injection, response analysis, and vulnerability discovery across REST APIs.
+> A full-stack API security testing platform for automated fuzzing, payload injection, endpoint management, and vulnerability discovery.
 
-## Overview
+API Fuzzer is an open-source web application designed to help developers, security engineers, and penetration testers identify vulnerabilities in REST APIs through automated fuzz testing.
 
-API Fuzzer helps security researchers, developers, and penetration testers identify potential vulnerabilities in web APIs by automatically injecting malicious payloads and analysing responses for unusual behaviour.
-
-The platform supports large-scale automated testing while providing a clean dashboard for scan management and result analysis.
+The platform provides an end-to-end workflow for managing API projects, configuring endpoints, executing fuzzing campaigns, and analysing responses through a modern web interface.
 
 ---
 
 ## Features
 
-### Automated API Fuzzing
+### Authentication
 
-* Send payloads against any HTTP endpoint
-* Support for GET, POST, PUT, PATCH and DELETE requests
-* Configurable target URLs
-* Automated payload execution
+* JWT-based authentication
+* User registration and login
+* Secure password hashing using BCrypt
+* Protected REST API endpoints
+
+### Project Management
+
+* Create, update and delete projects
+* Organise multiple API testing targets
+* Ownership-based authorization
+* User-specific project isolation
+
+### Endpoint Management
+
+* Create, update and delete API endpoints
+* Associate endpoints with projects
+* Support for:
+
+    * GET
+    * POST
+    * PUT
+    * PATCH
+    * DELETE
+* Authorization checks
+* Fully unit tested service and controller layers
 
 ### Payload Management
 
 * Persistent payload storage
-* Categorised payload libraries
+* Payload categorisation
 * Custom payload creation
-* Seeded vulnerability payload database
+* Built-in payload library
 
-Supported categories include:
+Supported payload categories include:
 
 * SQL Injection
 * Cross-Site Scripting (XSS)
 * Command Injection
 * Path Traversal
-* SSRF
+* Server-Side Request Forgery (SSRF)
 * Custom Payloads
 
-### Scan Management
+### Automated Fuzzing
 
-* Unique scan IDs for every fuzzing session
-* Scan grouping and tracking
-* Historical scan retrieval
-* Scan-specific result filtering
+* Execute payloads against REST APIs
+* Configurable target endpoints
+* Support for multiple HTTP methods
+* Scan identification using UUIDs
 
 ### Response Analysis
 
-The platform records:
+Every request records:
 
-* HTTP Status Codes
-* Response Times
-* Response Sizes
-* Response Bodies
-* Request Methods
-* Payload Categories
-* Target Endpoints
+* HTTP Status Code
+* Response Time
+* Response Size
+* Response Body
+* Target Endpoint
+* HTTP Method
+* Payload Used
+* Payload Category
+* Scan ID
+* Timestamp
 
-### Result Dashboard
+### Result Persistence
 
-* Real-time result monitoring
-* Historical result browsing
-* Scan-specific views
-* Detailed response inspection
-
-### Data Persistence
-
-All scans, payloads and results are stored in PostgreSQL for long-term analysis and reporting.
+All payloads, scan results, projects and endpoints are stored in PostgreSQL for long-term analysis and reporting.
 
 ---
 
@@ -73,10 +88,12 @@ All scans, payloads and results are stored in PostgreSQL for long-term analysis 
 
 * Java
 * Spring Boot
+* Spring Security
 * Spring Data JPA
 * Hibernate
 * Flyway
 * PostgreSQL
+* Gradle
 
 ### Frontend
 
@@ -90,103 +107,103 @@ All scans, payloads and results are stored in PostgreSQL for long-term analysis 
 
 * PostgreSQL
 
-### Build Tools
-
-* Gradle
-* npm
-
 ---
 
 ## Architecture
 
-Frontend (React)
-
-↓
-
-REST API
-
-↓
-
-Spring Boot Backend
-
-↓
-
-PostgreSQL Database
-
----
-
-## Database Schema
-
-### attack_payload
-
-Stores reusable attack payloads.
-
-| Field    | Type   |
-| -------- | ------ |
-| id       | SERIAL |
-| name     | TEXT   |
-| content  | TEXT   |
-| category | TEXT   |
-
-### fuzz_result
-
-Stores results generated during scans.
-
-| Field           | Type      |
-| --------------- | --------- |
-| id              | SERIAL    |
-| targetUrl       | TEXT      |
-| payloadContent  | TEXT      |
-| statusCode      | INTEGER   |
-| responseBody    | TEXT      |
-| responseTime    | BIGINT    |
-| responseSize    | BIGINT    |
-| payloadCategory | TEXT      |
-| httpMethod      | TEXT      |
-| timestamp       | TIMESTAMP |
-| scanId          | UUID      |
+```text
+                React Frontend
+                       │
+                       ▼
+                 REST Controllers
+                       │
+                       ▼
+                Spring Boot Services
+                       │
+                       ▼
+                  JPA Repositories
+                       │
+                       ▼
+                 PostgreSQL Database
+```
 
 ---
 
-## Security Use Cases
+## Current Database Model
 
-API Fuzzer can be used to test for:
+```text
+User
+ └── Project
+      └── Endpoint
+
+AttackPayload
+
+FuzzResult
+```
+
+---
+
+## Project Status
+
+### Completed
+
+* ✅ JWT Authentication
+* ✅ Project Management
+* ✅ Endpoint Management
+* ✅ Payload Management
+* ✅ Automated Fuzzing Engine
+* ✅ Scan Result Persistence
+* ✅ Response Analysis
+
+### Currently In Progress
+
+* 🚧 Request Builder
+* 🚧 Endpoint Headers
+* 🚧 Query Parameter Management
+
+### Planned Features
+
+* Authentication Profiles
+* Request Templates
+* Swagger/OpenAPI Import
+* Postman Collection Import
+* Automated Vulnerability Detection
+* Multi-threaded Scanning
+* Scan Scheduling
+* Report Generation (PDF/HTML)
+* Docker Deployment
+* Kubernetes Support
+
+---
+
+## Supported Vulnerability Testing
+
+API Fuzzer is designed to assist with testing for:
 
 * SQL Injection
-* Cross-Site Scripting
+* Cross-Site Scripting (XSS)
 * Command Injection
 * Path Traversal
-* Server-Side Request Forgery
-* Error Disclosure
+* Server-Side Request Forgery (SSRF)
 * Input Validation Issues
-* Unexpected Response Behaviour
+* Error Disclosure
+* Unexpected API Behaviour
 
 ---
 
-## Future Enhancements
+## Running Locally
 
-* Authentication support
-* JWT handling
-* OpenAPI/Swagger import
-* Multi-threaded scanning
-* Automated vulnerability detection
-* Report generation
-* Scan scheduling
-* Role-based access control
-* Docker deployment
-* Kubernetes support
+### Clone the Repository
 
----
+```bash
+git clone https://github.com/jeniths006/API-Fuzzer.git
 
-## Getting Started
+cd API-Fuzzer
+```
 
 ### Backend
 
 ```bash
-git clone https://github.com/yourusername/API-Fuzzer.git
-
-cd API-Fuzzer
-
 ./gradlew bootRun
 ```
 
@@ -202,21 +219,70 @@ npm run dev
 
 ### Database
 
-Configure PostgreSQL connection details in:
+Configure your PostgreSQL connection inside:
 
 ```properties
 application.properties
 ```
 
-Flyway migrations will automatically initialise the database.
+Flyway migrations will automatically initialise the database schema.
+
+---
+
+## Repository Structure
+
+```text
+API-Fuzzer
+│
+├── backend
+│   ├── controllers
+│   ├── services
+│   ├── repositories
+│   ├── security
+│   ├── models
+│   ├── dto
+│   └── flyway migrations
+│
+├── fuzzer-ui
+│   ├── React
+│   ├── Components
+│   ├── Pages
+│   └── Services
+│
+└── PostgreSQL
+```
+
+---
+
+## Why This Project?
+
+Many open-source API fuzzers focus solely on sending payloads to endpoints.
+
+API Fuzzer aims to provide a complete API security testing platform by combining:
+
+* Project management
+* Endpoint management
+* Payload libraries
+* Automated fuzzing
+* Response analysis
+* Historical scan tracking
+
+into a single modern web application.
+
+The long-term vision is to evolve the platform into a complete API security assessment suite capable of importing API specifications, handling authenticated APIs, scheduling scans, and automatically identifying potential vulnerabilities.
+
+---
+
+## Contributing
+
+Contributions, suggestions and feedback are always welcome.
+
+If you have ideas for new payloads, detection techniques, architecture improvements or features, feel free to open an issue or submit a pull request.
 
 ---
 
 ## Disclaimer
 
-This project is intended for educational, research and authorised security testing purposes only.
+This project is intended for educational purposes and authorised security testing only.
 
-Only test systems you own or have explicit permission to assess.
-
-```
-```
+Only test systems that you own or have explicit permission to assess.
