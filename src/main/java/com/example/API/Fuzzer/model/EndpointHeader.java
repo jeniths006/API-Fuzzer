@@ -7,27 +7,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Endpoint {
+public class EndpointHeader {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    @Enumerated(EnumType.STRING)
-    private HttpMethod method;
-    private String url;
+    private String headerName;
+    private String headerValue;
     @ManyToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
+    @JoinColumn(name = "endpoint_id)
+    private Endpoint endpoint;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<EndpointHeader> endpointHeaderList;
 }
