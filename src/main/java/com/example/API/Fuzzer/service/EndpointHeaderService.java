@@ -66,7 +66,7 @@ public class EndpointHeaderService {
     public EndpointHeaderResponseDTO updateHeader(Long headerId, CreateEndpointHeaderRequestDTO request) {
         User user = authenticationService.getCurrentUser();
         EndpointHeader endpointHeader = endpointHeaderRepository.findById(headerId)
-                .orElseThrow(() -> new EndpointNotFoundException("Endpoint not found"));
+                .orElseThrow(() -> new EndpointHeaderNotFoundException("Endpoint Header not found"));
 
         if(!endpointHeader.getEndpoint().getProject().getOwner().getId().equals(user.getId())) {
             throw new UnauthorizedProjectAccessException("You are not authorized to access this project");
