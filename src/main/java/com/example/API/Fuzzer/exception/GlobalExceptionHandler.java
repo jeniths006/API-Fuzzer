@@ -94,5 +94,18 @@ public class GlobalExceptionHandler {
                 .body(response);
     }
 
+    @ExceptionHandler(EndpointHeaderNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEndpointHeaderNotFound(EndpointHeaderNotFoundException ex) {
+        ErrorResponseDTO response = new ErrorResponseDTO(
+                ex.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
 
 }
