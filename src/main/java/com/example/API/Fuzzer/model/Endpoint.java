@@ -31,6 +31,9 @@ public class Endpoint {
     @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EndpointHeader> endpointHeaderList;
 
-    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL)
     private List<QueryParameter> queryParameters;
+
+    @OneToOne(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    private EndpointRequestBody endpointRequestBody;
 }

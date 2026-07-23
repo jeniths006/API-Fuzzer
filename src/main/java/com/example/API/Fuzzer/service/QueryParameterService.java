@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class QueryParameterService {
 
-    private final QueryParameterRepository QueryParameterRepository;
+    private final QueryParameterRepository queryParameterRepository;
     private final EndpointRepository endpointRepository;
     private final AuthenticationService authenticationService;
 
@@ -42,7 +42,7 @@ public class QueryParameterService {
         queryParameter.setCreatedAt(LocalDateTime.now());
         queryParameter.setUpdatedAt(LocalDateTime.now());
 
-        QueryParameter savedQueryParameter = QueryParameterRepository.save(queryParameter);
+        QueryParameter savedQueryParameter = queryParameterRepository.save(queryParameter);
 
         return mapToQueryParameterResponseDTO(savedQueryParameter);
 
@@ -57,7 +57,7 @@ public class QueryParameterService {
             throw new UnauthorizedProjectAccessException("You are not authorized to access this project");
         }
 
-        List<QueryParameter> queryParameters = QueryParameterRepository.findByEndpoint(endpoint);
+        List<QueryParameter> queryParameters = queryParameterRepository.findByEndpoint(endpoint);
         return queryParameters.stream()
                 .map(this::mapToQueryParameterResponseDTO)
                 .collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class QueryParameterService {
 
     public QueryParameterResponseDTO updateQueryParameter(Long queryParameterId, CreateQueryParameterRequestDTO request) {
         User user = authenticationService.getCurrentUser();
-        QueryParameter queryParameter = QueryParameterRepository.findById(queryParameterId)
+        QueryParameter queryParameter = queryParameterRepository.findById(queryParameterId)
                 .orElseThrow(() -> new QueryParameterNotFoundException("Query Parameter not found"));
 
         if(!queryParameter.getEndpoint().getProject().getOwner().getId().equals(user.getId())) {
@@ -77,7 +77,7 @@ public class QueryParameterService {
         queryParameter.setParameterValue(request.getParameterValue());
         queryParameter.setUpdatedAt(LocalDateTime.now());
 
-        QueryParameter updatedQueryParameter = QueryParameterRepository.save(queryParameter);
+        QueryParameter updatedQueryParameter = queryParameterRepository.save(queryParameter);
 
         return mapToQueryParameterResponseDTO(updatedQueryParameter);
     }
@@ -85,14 +85,14 @@ public class QueryParameterService {
     public void deleteQueryParameter(Long queryParameterId) {
         User user = authenticationService.getCurrentUser();
 
-        QueryParameter queryParameter = QueryParameterRepository.findById(queryParameterId)
+        QueryParameter queryParameter = queryParameterRepository.findById(queryParameterId)
                 .orElseThrow(() -> new QueryParameterNotFoundException("Query Parameter not found"));
 
         if(!queryParameter.getEndpoint().getProject().getOwner().getId().equals(user.getId())) {
             throw new UnauthorizedProjectAccessException("You are not authorizes to access this project");
         }
 
-        QueryParameterRepository.delete(queryParameter);
+        queryParameterRepository.delete(queryParameter);
     }
 
 
