@@ -30,4 +30,7 @@ public class Endpoint {
 
     @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<EndpointHeader> endpointHeaderList;
+
+    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QueryParameter> queryParameters;
 }
