@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -26,4 +27,13 @@ public class Endpoint {
     private Project project;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EndpointHeader> endpointHeaderList;
+
+    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    private List<QueryParameter> queryParameters;
+
+    @OneToOne(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    private EndpointRequestBody endpointRequestBody;
 }
