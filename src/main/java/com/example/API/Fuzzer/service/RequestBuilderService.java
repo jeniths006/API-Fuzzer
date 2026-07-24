@@ -22,10 +22,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RequestBuilderService {
 
-    private EndpointRepository endpointRepository;
-    private EndpointHeaderRepository endpointHeaderRepository;
-    private QueryParameterRepository queryParameterRepository;
-    private EndpointRequestBodyRepository endpointRequestBodyRepository;
+    private final EndpointRepository endpointRepository;
+    private final EndpointHeaderRepository endpointHeaderRepository;
+    private final QueryParameterRepository queryParameterRepository;
+    private final EndpointRequestBodyRepository endpointRequestBodyRepository;
 
     public BuiltRequestDTO buildRequest(Long endpointId) {
         Endpoint endpoint = endpointRepository.findById(endpointId)
