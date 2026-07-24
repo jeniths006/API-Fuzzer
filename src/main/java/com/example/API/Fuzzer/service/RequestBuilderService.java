@@ -34,7 +34,7 @@ public class RequestBuilderService {
         List<EndpointHeader> headers = endpointHeaderRepository.findByEndpoint(endpoint);
         List<QueryParameter> parameters = queryParameterRepository.findByEndpoint(endpoint);
         EndpointRequestBody requestBody = endpointRequestBodyRepository.findByEndpoint(endpoint)
-                .orElseThrow(() -> new EndpointRequestBodyNotFoundException("Request Body not found"));
+                .orElse(null);
 
         Map<String, String> headerMap =
                 headers.stream()

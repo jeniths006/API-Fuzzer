@@ -127,6 +127,18 @@ class RequestBuilderServiceTest {
 
     @Test
     void buildRequest_NoHeaders() {
+        when(endpointRepository.findById(10L))
+                .thenReturn(Optional.of(endpoint));
+
+        when(endpointHeaderRepository.findByEndpoint(endpoint))
+                .thenReturn(List.of());
+
+        when(queryParameterRepository.findByEndpoint(endpoint))
+                .thenReturn(List.of(queryParameter));
+
+        when(endpointRequestBodyRepository.findByEndpoint(endpoint))
+                .thenReturn(Optional.of(requestBody));
+
         when(endpointHeaderRepository.findByEndpoint(endpoint))
                 .thenReturn(List.of());
 
@@ -139,6 +151,18 @@ class RequestBuilderServiceTest {
 
     @Test
     void buildRequest_NoQueryParameters() {
+        when(endpointRepository.findById(10L))
+                .thenReturn(Optional.of(endpoint));
+
+        when(endpointHeaderRepository.findByEndpoint(endpoint))
+                .thenReturn(List.of(header));
+
+        when(queryParameterRepository.findByEndpoint(endpoint))
+                .thenReturn(List.of());
+
+        when(endpointRequestBodyRepository.findByEndpoint(endpoint))
+                .thenReturn(Optional.of(requestBody));
+
         when(queryParameterRepository.findByEndpoint(endpoint))
                 .thenReturn(List.of());
 
