@@ -42,10 +42,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
-
+        ex.printStackTrace();
 
         ErrorResponseDTO response = new ErrorResponseDTO(
-                "Internal server error",
+                ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 LocalDateTime.now()
         );
