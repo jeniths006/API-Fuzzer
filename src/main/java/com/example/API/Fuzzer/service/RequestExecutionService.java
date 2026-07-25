@@ -1,18 +1,21 @@
 package com.example.API.Fuzzer.service;
 
 import com.example.API.Fuzzer.dto.BuiltRequestDTO;
-import com.example.API.Fuzzer.exception.EndpointNotFoundException;
-import com.example.API.Fuzzer.model.Endpoint;
-import com.example.API.Fuzzer.repository.EndpointRepository;
+import com.example.API.Fuzzer.dto.ExecutionResultDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
+import reactor.core.publisher.Mono;
 
+import java.net.ConnectException;
 import java.net.URI;
+import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,59 +24,82 @@ public class RequestExecutionService {
     private final RequestBuilderService requestBuilderService;
     private final WebClient webClient;
 
-    public String execute(Long endpointId) {
-        BuiltRequestDTO builtRequestDTO = requestBuilderService.buildRequest(endpointId);
+    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
 
+    public ExecutionResultDTO execute(Long endpointId) {
+        BuiltRequestDTO builtRequestDTO = requestBuilderService.buildRequest(endpointId);
         HttpMethod httpMethod = HttpMethod.valueOf(builtRequestDTO.getMethod().name());
 
-        if(builtRequestDTO.getBody() != null) {
-            var response =  webClient
-                    .method(httpMethod)
-                    .uri(uriBuilder -> {
-                        URI uri = URI.create(builtRequestDTO.getUrl());
+        long startTime = System.currentTimeMillis();
 
-                        UriBuilder builder = uriBuilder
-                                .scheme(uri.getScheme())
-                                .host(uri.getHost())
-                                .path(uri.getPath());
+        var initRequest = webClient
+                .method(httpMethod)
+                .uri(uriBuilder -> {
+                    URI uri = URI.create(builtRequestDTO.getUrl());
 
-                        builtRequestDTO.getQueryParameters().forEach(builder::queryParam);
+                    UriBuilder builder = uriBuilder
+                            .scheme(uri.getScheme())
+                            .host(uri.getHost())
+                            .port(uri.getPort()) // preserve non-default ports; -1 = default, which is fine
+                            .path(uri.getPath());
 
-                        return builder.build();
-                    })
-                    .headers(headers ->
-                            builtRequestDTO.getHeaders().forEach(headers::add))
-                    .header(HttpHeaders.CONTENT_TYPE, builtRequestDTO.getContentType().getValue())
-                    .bodyValue(builtRequestDTO.getBody())
-                    .retrieve()
-                    .toEntity(String.class)
+                    builtRequestDTO.getQueryParameters().forEach(builder::queryParam);
+
+                    return builder.build();
+                })
+                .headers(headers ->
+                        builtRequestDTO.getHeaders().forEach(headers::add));
+
+        var finalRequest = (builtRequestDTO.getBody() != null)
+                ? initRequest
+                .header(HttpHeaders.CONTENT_TYPE, builtRequestDTO.getContentType().getValue())
+                .bodyValue(builtRequestDTO.getBody())
+                : initRequest;
+
+        try {
+            ExecutionResultDTO result = finalRequest
+                    .exchangeToMono(this::toExecutionResultDTO)
+                    .timeout(REQUEST_TIMEOUT)
                     .block();
 
-            return response != null ? response.getBody() : null;
+            result.setResponseTime(System.currentTimeMillis() - startTime);
+            return result;
+
+        } catch (Exception ex) {
+            long responseTime = System.currentTimeMillis() - startTime;
+            return buildErrorResult(ex, responseTime);
         }
-        else {
-            var response = webClient
-                    .method(httpMethod)
-                    .uri(uriBuilder -> {
-                        URI uri = URI.create(builtRequestDTO.getUrl());
+    }
 
-                        UriBuilder builder = uriBuilder
-                                .scheme(uri.getScheme())
-                                .host(uri.getHost())
-                                .path(uri.getPath());
+    private Mono<ExecutionResultDTO> toExecutionResultDTO(ClientResponse response) {
+        return response.bodyToMono(String.class)
+                .defaultIfEmpty("")
+                .map(body -> {
+                    ExecutionResultDTO dto = new ExecutionResultDTO();
+                    HttpStatusCode status = response.statusCode();
+                    dto.setStatusCode(status.value());
+                    dto.setResponseBody(body);
+                    dto.setResponseSize(body.length());
+                    dto.setResponseHeaders(response.headers().asHttpHeaders());
+                    dto.setSuccessful(status.is2xxSuccessful());
+                    return dto;
+                });
+    }
 
-                        builtRequestDTO.getQueryParameters().forEach(builder::queryParam);
+    private ExecutionResultDTO buildErrorResult(Throwable ex, long responseTime) {
+        ExecutionResultDTO dto = new ExecutionResultDTO();
+        dto.setStatusCode(0);
+        dto.setSuccessful(false);
+        dto.setResponseTime(responseTime);
+        dto.setResponseSize(0);
 
-                        return builder.build();
-                    })
-                    .headers(headers ->
-                            builtRequestDTO.getHeaders().forEach(headers::add))
-                    .retrieve()
-                    .toEntity(String.class)
-                    .block();
+        String reason = (ex instanceof TimeoutException)
+                ? "Request timed out after " + REQUEST_TIMEOUT.getSeconds() + "s"
+                : (ex.getCause() instanceof ConnectException || ex instanceof ConnectException)
+                  ? "Connection failed: " + ex.getMessage()
+                  : "Request failed: " + ex.getMessage();
 
-            return response != null ? response.getBody() : null;
-
-        }
+        dto.setResponseBody(reason);
+        return dto;
     }
 }

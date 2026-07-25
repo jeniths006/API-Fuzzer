@@ -1,5 +1,6 @@
 package com.example.API.Fuzzer.controller;
 
+import com.example.API.Fuzzer.dto.ExecutionResultDTO;
 import com.example.API.Fuzzer.service.RequestExecutionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,7 +16,7 @@ public class RequestExecutionController {
     private final RequestExecutionService requestExecutionService;
 
     @PostMapping("/endpoints/{endpointId}/execute")
-    public String executeRequest(@PathVariable Long endpointId) {
+    public ExecutionResultDTO executeRequest(@PathVariable Long endpointId) {
         return requestExecutionService.execute(endpointId);
     }
 }
