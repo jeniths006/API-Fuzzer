@@ -36,4 +36,7 @@ public class Endpoint {
 
     @OneToOne(mappedBy = "endpoint", cascade = CascadeType.ALL)
     private EndpointRequestBody endpointRequestBody;
+
+    @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    private List<ExecutionResult> executionResult;
 }
