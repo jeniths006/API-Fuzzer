@@ -52,6 +52,7 @@ public class RequestBuilderService {
 
 
         BuiltRequestDTO builtRequestDTO = new BuiltRequestDTO(
+                endpointId,
                 endpoint.getUrl(),
                 endpoint.getMethod(),
                 headerMap,

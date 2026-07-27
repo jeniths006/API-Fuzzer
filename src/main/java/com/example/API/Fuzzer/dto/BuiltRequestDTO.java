@@ -1,5 +1,6 @@
 package com.example.API.Fuzzer.dto;
 
+import com.example.API.Fuzzer.model.Endpoint;
 import com.example.API.Fuzzer.model.HttpMethod;
 import com.example.API.Fuzzer.util.ContentType;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class BuiltRequestDTO {
 
+    private Long endpointId;
     private String url;
     private HttpMethod method;
     private Map<String, String> headers;
