@@ -2,10 +2,8 @@ package com.example.API.Fuzzer.service;
 
 import com.example.API.Fuzzer.dto.BuiltRequestDTO;
 import com.example.API.Fuzzer.dto.ExecutionResultDTO;
-import com.example.API.Fuzzer.exception.EndpointNotFoundException;
 import com.example.API.Fuzzer.model.Endpoint;
 import com.example.API.Fuzzer.model.ExecutionResult;
-import com.example.API.Fuzzer.repository.EndpointRepository;
 import com.example.API.Fuzzer.repository.ExecutionResultRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -32,16 +30,14 @@ public class RequestExecutionService {
     private final ExecutionResultRepository executionResultRepository;
 
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
-    private final EndpointRepository endpointRepository;
 
-    public ExecutionResultDTO execute(Long endpointId) {
-        Endpoint endpoint = endpointRepository.findById(endpointId)
-                .orElseThrow(() -> new EndpointNotFoundException("Endpoint not found"));
-        BuiltRequestDTO builtRequestDTO = requestBuilderService.buildRequest(endpointId);
+
+    public ExecutionResultDTO execute(Endpoint endpoint, BuiltRequestDTO builtRequestDTO) {
+
+
         HttpMethod httpMethod = HttpMethod.valueOf(builtRequestDTO.getMethod().name());
 
         long startTime = System.currentTimeMillis();
-
         var initRequest = webClient
                 .method(httpMethod)
                 .uri(uriBuilder -> {
@@ -134,4 +130,6 @@ public class RequestExecutionService {
         executionResult.setExecutedAt(LocalDateTime.now());
         executionResultRepository.save(executionResult);
     }
+
+
 }
