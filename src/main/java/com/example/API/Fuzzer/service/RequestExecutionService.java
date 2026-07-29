@@ -28,8 +28,10 @@ public class RequestExecutionService {
     private final RequestBuilderService requestBuilderService;
     private final WebClient webClient;
     private final ExecutionResultRepository executionResultRepository;
+    private final ResponseAnalysisService responseAnalysisService;
 
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
+
 
 
     public ExecutionResultDTO execute(Endpoint endpoint, BuiltRequestDTO builtRequestDTO) {
@@ -70,9 +72,8 @@ public class RequestExecutionService {
             long responseTime = System.currentTimeMillis() - startTime;
             result.setResponseTime(responseTime);
 
-            saveExecutionResult(endpoint, result);
-
-
+            ExecutionResult savedExecutionResult = saveExecutionResult(endpoint, result);
+            responseAnalysisService.runAnalysis(savedExecutionResult);
 
             return result;
 
@@ -80,8 +81,9 @@ public class RequestExecutionService {
             long responseTime = System.currentTimeMillis() - startTime;
             ExecutionResultDTO executionResultDTO = buildErrorResult(ex, responseTime);
 
-            saveExecutionResult(endpoint, executionResultDTO);
+            ExecutionResult savedExecutionResult = saveExecutionResult(endpoint, executionResultDTO);
 
+            responseAnalysisService.runAnalysis(savedExecutionResult);
             return executionResultDTO;
 
         }
@@ -119,7 +121,7 @@ public class RequestExecutionService {
         return dto;
     }
 
-    private void saveExecutionResult(Endpoint endpoint, ExecutionResultDTO executionResultDTO) {
+    private ExecutionResult saveExecutionResult(Endpoint endpoint, ExecutionResultDTO executionResultDTO) {
         ExecutionResult executionResult = new ExecutionResult();
         executionResult.setEndpoint(endpoint);
         executionResult.setStatusCode(executionResultDTO.getStatusCode());
@@ -128,7 +130,10 @@ public class RequestExecutionService {
         executionResult.setResponseSize(executionResultDTO.getResponseSize());
         executionResult.setSuccessful(executionResultDTO.isSuccessful());
         executionResult.setExecutedAt(LocalDateTime.now());
-        executionResultRepository.save(executionResult);
+        ExecutionResult savedExecutionResult = executionResultRepository.save(executionResult);
+
+        return savedExecutionResult;
+
     }
 
 

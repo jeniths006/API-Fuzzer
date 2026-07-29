@@ -28,3 +28,4 @@ jobs:
           DEFAULT_BRANCH: "master"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           JAVA_FILE_NAME: checkstyle.xml
+          SQLFLUFF_CONFIG: .sqlfluff
