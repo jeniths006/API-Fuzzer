@@ -8,7 +8,7 @@ import static com.example.API.Fuzzer.service.analyzer.VulnerabilitySeverity.HIGH
 import static com.example.API.Fuzzer.service.analyzer.VulnerabilitySeverity.LOW;
 
 @Service
-public class SQLInjectionAnalyzer implements VulnerabilityAnalyzer{
+public class SQLInjectionAnalyzerService implements VulnerabilityAnalyzer{
 
     @Override
     public AnalysisResult analyze(ExecutionResult executionResult) {
