@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Projects</title>
+</head>
+<body>
+    <h1>Projects</h1>
+    <div id="projects"></div>
+
+    <script>
+        fetch('/api/projects')
+            .then(response => response.json())
+            .then(data => {
+                const projectsDiv = document.getElementById('projects');
+                data.forEach(project => {
+                    const projectLink = document.createElement('a');
+                    projectLink.href = `/projects/${project.id}`;
+                    projectLink.innerText = project.name;
+                    projectsDiv.appendChild(projectLink);
+                    projectsDiv.appendChild(document.createElement('br'));
+                });
+            });
+    </script>
+</body>
+</html>
