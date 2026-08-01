@@ -1,6 +1,7 @@
 package com.example.API.Fuzzer.dto;
 
 import com.example.API.Fuzzer.model.HttpMethod;
+import com.example.API.Fuzzer.util.ContentType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,4 +23,7 @@ public class CreateEndpointRequestDTO {
 
     @NotBlank(message = "Endpoint URL is required")
     private String url;
+
+    @NotNull(message = "Content type is required")
+    private ContentType contentType;
 }

@@ -9,7 +9,9 @@ import com.example.API.Fuzzer.service.PayloadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
@@ -40,35 +42,27 @@ public class PayloadController {
     }
 
     @DeleteMapping("/{id}")
-    public String DeletePayload(@PathVariable Long id) {
-        System.out.println(repo.existsById(id));
+    public Map<String, String> DeletePayload(@PathVariable Long id) {
+        Map<String, String> response = new HashMap<>();
         if (repo.existsById(id)) {
             repo.deleteById(id);
-            return "Payload with ID" + id + " deleted successfully.";
+            response.put("message", "Payload with ID " + id + " deleted successfully.");
+            return response;
         }
         else {
-            return "Payload not found";
+            response.put("message", "Payload not found");
+            return response;
         }
     }
 
-    @PostMapping("/fuzz/{id}")
-    public String fuzz(@PathVariable Long id, @RequestParam String targetUrl) {
-        UUID scanId = UUID.randomUUID();
-        AttackPayload payload = payloadService.getPayloadById(id);
-        fuzzer.fuzz(targetUrl, payload, scanId);
-        return "Fuzzing attack initiated for payload ID: " + id + " against " + targetUrl;
-    }
+
 
     @GetMapping("/results")
     public List<FuzzResult> getAllResults() {
         return fuzzResultRepository.findAll();
     }
 
-    @PostMapping("/fuzz-all")
-    public String fuzzAll(@RequestParam String targetUrl) {
-        fuzzer.fuzzAll(targetUrl);
-        return "Fuzzing All initiated for " + targetUrl;
-    }
+
 
     @GetMapping("/results/scan/{scanId}")
     public List<FuzzResult> getResultsByScanId(@PathVariable UUID scanId) {

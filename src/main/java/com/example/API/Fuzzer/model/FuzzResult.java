@@ -26,4 +26,7 @@ public class FuzzResult {
     private LocalDateTime timestamp;
 
     private UUID scanId;
+
+    @ManyToOne
+    private ExecutionResult executionResult;
 }

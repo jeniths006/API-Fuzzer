@@ -11,4 +11,6 @@ public interface AnalysisResultRepository extends JpaRepository<AnalysisResult, 
 
     List<AnalysisResult> findByExecutionResult(ExecutionResult executionResult);
 
+    List<AnalysisResult> findByExecutionResultId(Long executionResultId);
+
 }

@@ -121,7 +121,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(EndpointRequestBodyNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleRequestBodyNotFound(QueryParameterNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDTO> handleRequestBodyNotFound(EndpointRequestBodyNotFoundException ex) {
         ErrorResponseDTO response = new ErrorResponseDTO(
                 ex.getMessage(),
                 HttpStatus.NOT_FOUND.value(),

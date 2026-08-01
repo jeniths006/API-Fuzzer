@@ -4,11 +4,9 @@ import com.example.API.Fuzzer.dto.CreateProjectRequestDTO;
 import com.example.API.Fuzzer.dto.ProjectResponseDTO;
 import com.example.API.Fuzzer.service.ProjectService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,6 +18,16 @@ public class ProjectController {
     @PostMapping
     public ProjectResponseDTO createProject(@RequestBody CreateProjectRequestDTO request) {
         return projectService.createProject(request);
+    }
+
+    @GetMapping
+    public List<ProjectResponseDTO> getProjects() {
+        return projectService.getProjects();
+    }
+
+    @DeleteMapping("/{projectId}")
+    public void deleteProject(@PathVariable Long projectId) {
+        projectService.deleteProject(projectId);
     }
 
 }

@@ -14,6 +14,6 @@ public interface FuzzResultRepository extends JpaRepository<FuzzResult, Long> {
 
     public List<FuzzResult> findByscanId(UUID scanId);
 
-    @Query("SELECT f.scanId, COUNT(f) FROM FuzzResult f GROUP BY f.scanId ORDER BY MAX(f.timestamp) DESC")
+    @Query("SELECT f.scanId, COUNT(f), MAX(f.timestamp), e.name, p.id FROM FuzzResult f JOIN f.executionResult er JOIN er.endpoint e JOIN e.project p GROUP BY f.scanId, e.name, p.id ORDER BY MAX(f.timestamp) DESC")
     List<Object[]> getScanSummaries();
 }

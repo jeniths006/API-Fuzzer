@@ -41,7 +41,7 @@ public class SQLInjectionAnalyzerService implements VulnerabilityAnalyzer{
             result.setDetected(true);
             result.setSeverity(HIGH);
             result.setConfidence(90);
-            result.setEvidence("Database error message exposed in response");
+            result.setEvidence("Database error message exposed in response: " + response);
         }
 
         return result;

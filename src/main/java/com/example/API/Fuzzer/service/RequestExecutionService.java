@@ -25,22 +25,19 @@ import java.util.concurrent.TimeoutException;
 @RequiredArgsConstructor
 public class RequestExecutionService {
 
-    private final RequestBuilderService requestBuilderService;
     private final WebClient webClient;
     private final ExecutionResultRepository executionResultRepository;
     private final ResponseAnalysisService responseAnalysisService;
 
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
 
-
-
     public ExecutionResultDTO execute(Endpoint endpoint, BuiltRequestDTO builtRequestDTO) {
-
 
         HttpMethod httpMethod = HttpMethod.valueOf(builtRequestDTO.getMethod().name());
 
         long startTime = System.currentTimeMillis();
-        var initRequest = webClient
+
+        WebClient.RequestBodySpec requestSpec = webClient
                 .method(httpMethod)
                 .uri(uriBuilder -> {
                     URI uri = URI.create(builtRequestDTO.getUrl());
@@ -48,46 +45,71 @@ public class RequestExecutionService {
                     UriBuilder builder = uriBuilder
                             .scheme(uri.getScheme())
                             .host(uri.getHost())
-                            .port(uri.getPort()) // preserve non-default ports; -1 = default, which is fine
+                            .port(uri.getPort())
                             .path(uri.getPath());
 
-                    builtRequestDTO.getQueryParameters().forEach(builder::queryParam);
+                    builtRequestDTO.getQueryParameters()
+                            .forEach(builder::queryParam);
 
                     return builder.build();
-                })
-                .headers(headers ->
-                        builtRequestDTO.getHeaders().forEach(headers::add));
+                });
 
-        var finalRequest = (builtRequestDTO.getBody() != null)
-                ? initRequest
-                .header(HttpHeaders.CONTENT_TYPE, builtRequestDTO.getContentType().getValue())
-                .bodyValue(builtRequestDTO.getBody())
-                : initRequest;
+        requestSpec.headers(headers ->
+                builtRequestDTO.getHeaders()
+                        .forEach(headers::add)
+        );
+
+        WebClient.RequestHeadersSpec<?> finalRequest;
+
+        if (builtRequestDTO.getBody() != null) {
+
+            if (builtRequestDTO.getContentType() != null) {
+                requestSpec.header(
+                        HttpHeaders.CONTENT_TYPE,
+                        builtRequestDTO.getContentType().getValue()
+                );
+            }
+
+            finalRequest = requestSpec.bodyValue(builtRequestDTO.getBody());
+
+        } else {
+            finalRequest = requestSpec;
+        }
+
 
         try {
             ExecutionResultDTO result = finalRequest
                     .exchangeToMono(this::toExecutionResultDTO)
                     .timeout(REQUEST_TIMEOUT)
                     .block();
+
             long responseTime = System.currentTimeMillis() - startTime;
             result.setResponseTime(responseTime);
 
-            ExecutionResult savedExecutionResult = saveExecutionResult(endpoint, result);
+            ExecutionResult savedExecutionResult =
+                    saveExecutionResult(endpoint, result);
+
             responseAnalysisService.runAnalysis(savedExecutionResult);
 
             return result;
 
         } catch (Exception ex) {
-            long responseTime = System.currentTimeMillis() - startTime;
-            ExecutionResultDTO executionResultDTO = buildErrorResult(ex, responseTime);
 
-            ExecutionResult savedExecutionResult = saveExecutionResult(endpoint, executionResultDTO);
+            long responseTime = System.currentTimeMillis() - startTime;
+
+            ExecutionResultDTO executionResultDTO =
+                    buildErrorResult(ex, responseTime);
+
+            ExecutionResult savedExecutionResult =
+                    saveExecutionResult(endpoint, executionResultDTO);
 
             responseAnalysisService.runAnalysis(savedExecutionResult);
-            return executionResultDTO;
 
+            return executionResultDTO;
         }
     }
+
+
 
     private Mono<ExecutionResultDTO> toExecutionResultDTO(ClientResponse response) {
         return response.bodyToMono(String.class)

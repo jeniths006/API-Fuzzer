@@ -1,6 +1,7 @@
 package com.example.API.Fuzzer.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,9 +21,11 @@ public class ExecutionResult {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Endpoint endpoint;
 
     private int statusCode;
+    @Column(columnDefinition = "TEXT")
     private String responseBody;
     private long responseTime;
     private long responseSize;

@@ -36,6 +36,7 @@ public class UserController {
     @GetMapping("/me")
     public UserResponseDTO getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         User user = (User) authentication.getPrincipal();
 
         UserResponseDTO response = new UserResponseDTO(

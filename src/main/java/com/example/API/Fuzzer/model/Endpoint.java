@@ -1,5 +1,6 @@
 package com.example.API.Fuzzer.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,14 +30,18 @@ public class Endpoint {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<EndpointHeader> endpointHeaderList;
 
     @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<QueryParameter> queryParameters;
 
     @OneToOne(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    @JsonIgnore
     private EndpointRequestBody endpointRequestBody;
 
     @OneToMany(mappedBy = "endpoint", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<ExecutionResult> executionResult;
 }

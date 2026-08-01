@@ -28,6 +28,7 @@ public class AnalysisResult {
 
     private int confidence;
     private boolean detected;
-    @Lob
+    
+    @Column(columnDefinition = "TEXT")
     private String evidence;
 }
