@@ -11,3 +11,8 @@ logs/
 *.log
 .claude-replay.*
 .tmp-*
+.figma/
+AGENTS.md
+CLAUDE.md
+.mise.toml
+pnpm-lock.yaml
